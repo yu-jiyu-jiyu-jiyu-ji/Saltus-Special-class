@@ -3,11 +3,13 @@ services:
     name: mtg-support-system
     runtime: node
     plan: free
-    buildCommand: npm install && npx prisma generate && npm run build
+    buildCommand: npm install && npm run build
     startCommand: npm start
     envVars:
       - key: NODE_ENV
         value: production
+      - key: DIRECT_URL
+        sync: false
       - key: DATABASE_URL
         sync: false
       - key: AUTH_SECRET

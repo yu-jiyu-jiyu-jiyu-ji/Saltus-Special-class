@@ -13,8 +13,6 @@ function resolveConnectionString(): string {
   const direct = process.env.DIRECT_URL?.trim();
   const pooled = process.env.DATABASE_URL?.trim();
 
-  // DIRECT_URL を優先（Supabase + pg adapter で安定）。
-  // マシン全体の DATABASE_URL=localhost が .env を上書きしている環境でも動作する。
   if (direct) {
     return direct;
   }
@@ -43,17 +41,28 @@ function createPrismaClient(): PrismaClient {
   }
 
   const pool = globalForPrisma.pool ?? new Pool({ connectionString });
-  if (process.env.NODE_ENV !== "production") {
-    globalForPrisma.pool = pool;
-    globalForPrisma.poolConnectionString = connectionString;
-  }
+  globalForPrisma.pool = pool;
+  globalForPrisma.poolConnectionString = connectionString;
 
   const adapter = new PrismaPg(pool);
   return new PrismaClient({ adapter });
 }
 
-export const prisma = globalForPrisma.prisma ?? createPrismaClient();
-
-if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.prisma = prisma;
+function getPrismaClient(): PrismaClient {
+  if (!globalForPrisma.prisma) {
+    globalForPrisma.prisma = createPrismaClient();
+  }
+  return globalForPrisma.prisma;
 }
+
+// ビルド時（DB未設定）に import だけで落ちないよう、初回クエリまで接続を遅延する
+export const prisma = new Proxy({} as PrismaClient, {
+  get(_target, prop) {
+    const client = getPrismaClient();
+    const value = client[prop as keyof PrismaClient];
+    if (typeof value === "function") {
+      return (value as (...args: unknown[]) => unknown).bind(client);
+    }
+    return value;
+  },
+});
