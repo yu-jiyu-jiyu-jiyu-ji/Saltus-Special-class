@@ -1,0 +1,104 @@
+// 個別MTG知見ストック＆サポート管理システム — ベーススキーマ
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  ADMIN
+  MANAGER
+  MEMBER
+}
+
+enum TicketType {
+  SYSTEM
+  USAGE
+}
+
+enum TicketStatus {
+  OPEN
+  PENDING
+  RESOLVED
+  CANCELLED
+}
+
+model User {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  name              String
+  passwordHash      String
+  role              Role      @default(MEMBER)
+  resetToken        String?   @unique
+  resetTokenExpires DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  meetings          Meeting[]
+  meetingComments   MeetingComment[]
+  tickets           Ticket[]
+  comments          Comment[]
+}
+
+model Ticket {
+  id           String       @id @default(cuid())
+  createdAt    DateTime     @default(now())
+  type         TicketType
+  status       TicketStatus @default(OPEN)
+  systemField1 String?
+  systemField2 String?
+  systemField3 String?
+  usageField1  String?
+  usageField2  String?
+  userId       String
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments     Comment[]
+
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  content   String   @db.Text
+  ticketId  String
+  userId    String
+  ticket    Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+  @@index([createdAt])
+}
+
+model Meeting {
+  id           String           @id @default(cuid())
+  createdAt    DateTime         @default(now())
+  date         DateTime         @db.Date
+  participants String?
+  content      String           @db.Text
+  homework     Json             @default("[]")
+  userId       String
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments     MeetingComment[]
+
+  @@index([userId])
+  @@index([date])
+}
+
+model MeetingComment {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  content   String   @db.Text
+  meetingId String
+  userId    String
+  meeting   Meeting  @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([meetingId])
+  @@index([createdAt])
+}

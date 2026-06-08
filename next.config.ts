@@ -1,7 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  // 開発時の左下「N」メニュー（Next.js Dev Indicator）を非表示
+  devIndicators: false,
 };
 
 export default nextConfig;
