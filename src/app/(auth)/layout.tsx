@@ -25,11 +25,9 @@ export default function AuthLayout({
                 Saltus Platform
               </p>
               <h1 className="mt-4 text-3xl font-bold leading-tight text-white drop-shadow-sm">
-                個別MTG知見ストック
-                <br />
-                ＆サポート管理
+                個別MTG知見ストック＆サポート管理
               </h1>
-              <p className="mt-4 max-w-md text-sm leading-7 text-slate-200 drop-shadow-sm">
+              <p className="mt-4 max-w-lg text-sm leading-7 text-slate-200 drop-shadow-sm [word-break:keep-all]">
                 特進クラスの MTG 記録とサポート対応を一元管理するためのベースプラットフォームです。
               </p>
             </div>
