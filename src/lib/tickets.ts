@@ -39,11 +39,62 @@ export function canCancelTicket(user: SessionUser, ticket: { userId: string }): 
   return ticket.userId === user.id;
 }
 
-export function buildTicketListWhere(user: SessionUser): Prisma.TicketWhereInput {
-  if (canViewAllTickets(user.role)) {
-    return {};
+export type TicketListFilters = {
+  q?: string;
+  status?: string;
+  date?: string;
+  type?: string;
+};
+
+const TICKET_STATUSES: TicketStatus[] = ["OPEN", "PENDING", "RESOLVED", "CANCELLED"];
+const TICKET_TYPES: TicketType[] = ["SYSTEM", "USAGE"];
+
+export function buildTicketListWhere(
+  user: SessionUser,
+  filters: TicketListFilters = {},
+): Prisma.TicketWhereInput {
+  const where: Prisma.TicketWhereInput = {};
+
+  if (!canViewAllTickets(user.role)) {
+    where.userId = user.id;
   }
-  return { userId: user.id };
+
+  const status = filters.status?.trim();
+  if (status && TICKET_STATUSES.includes(status as TicketStatus)) {
+    where.status = status as TicketStatus;
+  }
+
+  const type = filters.type?.trim();
+  if (type && TICKET_TYPES.includes(type as TicketType)) {
+    where.type = type as TicketType;
+  }
+
+  if (filters.date) {
+    const parsed = new Date(`${filters.date}T00:00:00+09:00`);
+    if (!Number.isNaN(parsed.getTime())) {
+      const next = new Date(parsed);
+      next.setDate(next.getDate() + 1);
+      where.createdAt = {
+        gte: parsed,
+        lt: next,
+      };
+    }
+  }
+
+  const keyword = filters.q?.trim();
+  if (keyword) {
+    where.OR = [
+      { title: { contains: keyword, mode: "insensitive" } },
+      { systemField1: { contains: keyword, mode: "insensitive" } },
+      { systemField2: { contains: keyword, mode: "insensitive" } },
+      { systemField3: { contains: keyword, mode: "insensitive" } },
+      { usageField1: { contains: keyword, mode: "insensitive" } },
+      { usageField2: { contains: keyword, mode: "insensitive" } },
+      { user: { name: { contains: keyword, mode: "insensitive" } } },
+    ];
+  }
+
+  return where;
 }
 
 export function getTicketTitle(ticket: {

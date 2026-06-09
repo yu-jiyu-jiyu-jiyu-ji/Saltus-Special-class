@@ -5,14 +5,22 @@ import { buildTicketListWhere } from "@/lib/tickets";
 import { prisma } from "@/lib/prisma";
 import { ticketCreateSchema } from "@/lib/validators";
 
-export async function GET() {
+export async function GET(request: Request) {
   const userOrError = await requireApiUser();
   if (isApiError(userOrError)) {
     return userOrError;
   }
 
+  const { searchParams } = new URL(request.url);
+  const where = buildTicketListWhere(userOrError, {
+    q: searchParams.get("q") ?? undefined,
+    status: searchParams.get("status") ?? undefined,
+    date: searchParams.get("date") ?? undefined,
+    type: searchParams.get("type") ?? undefined,
+  });
+
   const tickets = await prisma.ticket.findMany({
-    where: buildTicketListWhere(userOrError),
+    where,
     orderBy: { createdAt: "desc" },
     include: {
       user: {
