@@ -20,12 +20,6 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard/guide", label: "使い方", icon: "📖" },
   { href: "/dashboard/settings", label: "設定", icon: "🔧" },
   {
-    href: "/dashboard/admin",
-    label: "管理設定",
-    icon: "⚙",
-    roles: ["ADMIN"],
-  },
-  {
     href: "/dashboard/admin/spec",
     label: "仕様書",
     icon: "📋",
