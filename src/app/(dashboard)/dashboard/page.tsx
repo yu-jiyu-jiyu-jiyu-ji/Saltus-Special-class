@@ -14,6 +14,25 @@ export default async function DashboardPage() {
         description="個別MTGの知見を蓄積し、サポート対応を管理するためのホーム画面です。"
       />
 
+      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h2 className="text-lg font-semibold text-slate-900">はじめに</h2>
+        <ul className="mt-4 space-y-3 text-sm leading-7 text-slate-600">
+          <li>・左のサイドバーから各機能へ移動できます。</li>
+          <li>
+            ・使い方がわからない場合は
+            <Link
+              href="/dashboard/guide"
+              className="font-medium text-sky-700 underline underline-offset-2 hover:text-sky-800"
+            >
+              使い方
+            </Link>
+            をご覧ください。
+          </li>
+          <li>・新規登録時の権限は「メンバー」です。</li>
+          <li>・マネージャー・管理者権限はシステム管理者が付与します。</li>
+        </ul>
+      </section>
+
       <section className="grid gap-4 md:grid-cols-3">
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
@@ -54,15 +73,6 @@ export default async function DashboardPage() {
             画面を見る →
           </p>
         </Link>
-      </section>
-
-      <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-900">はじめに</h2>
-        <ul className="mt-4 space-y-3 text-sm leading-7 text-slate-600">
-          <li>・左のサイドバーから各機能へ移動できます。</li>
-          <li>・新規登録時の権限は「メンバー」です。</li>
-          <li>・マネージャー・管理者権限はシステム管理者が付与します。</li>
-        </ul>
       </section>
     </div>
   );
