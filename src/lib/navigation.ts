@@ -25,4 +25,10 @@ export const NAV_ITEMS: NavItem[] = [
     icon: "⚙",
     roles: ["ADMIN"],
   },
+  {
+    href: "/dashboard/admin/spec",
+    label: "仕様書",
+    icon: "📋",
+    roles: ["ADMIN"],
+  },
 ];

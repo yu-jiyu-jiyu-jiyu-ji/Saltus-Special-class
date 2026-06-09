@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { DeletedMeetingsTable } from "@/components/admin/DeletedMeetingsTable";
@@ -54,6 +55,18 @@ export default async function AdminPage() {
         title="管理設定"
         description="登録ユーザーの一覧と権限を管理します。"
       />
+
+      <div className="rounded-2xl border border-sky-100 bg-sky-50 px-5 py-4 text-sm text-slate-700">
+        システムの設計・DB・拡張ロードマップは
+        <Link
+          href="/dashboard/admin/spec"
+          className="mx-1 font-semibold text-sky-800 underline underline-offset-2 hover:text-sky-900"
+        >
+          仕様書
+        </Link>
+        をご覧ください（管理者専用）。
+      </div>
+
       <UserRoleTable users={serialized} currentUserId={user.id} />
 
       <div className="space-y-4">

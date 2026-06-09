@@ -18,6 +18,16 @@ export function Sidebar({ user, onNavigate }: SidebarProps) {
     (item) => !item.roles || item.roles.includes(user.role),
   );
 
+  const activeHref =
+    visibleItems
+      .filter(
+        (item) =>
+          pathname === item.href ||
+          (item.href !== "/dashboard" && pathname.startsWith(`${item.href}/`)) ||
+          (item.href !== "/dashboard" && pathname.startsWith(item.href)),
+      )
+      .sort((a, b) => b.href.length - a.href.length)[0]?.href ?? null;
+
   return (
     <aside className="flex h-full flex-col bg-white">
       <div className="border-b border-slate-100 px-5 py-5">
@@ -38,9 +48,7 @@ export function Sidebar({ user, onNavigate }: SidebarProps) {
         </p>
         <div className="space-y-1">
           {visibleItems.map((item) => {
-            const active =
-              pathname === item.href ||
-              (item.href !== "/dashboard" && pathname.startsWith(item.href));
+            const active = item.href === activeHref;
 
             return (
               <Link
