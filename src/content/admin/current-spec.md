@@ -74,7 +74,7 @@ public/                   # 静的ファイル（help 画像、auth/tiger.png）
 | `/dashboard/support` | 問い合わせ一覧 | 全員（表示範囲はロール依存） |
 | `/dashboard/support/[id]` | 問い合わせスレッド | 起票者 or ADMIN |
 | `/dashboard/guide` | 使い方ガイド | 全員 |
-| `/dashboard/settings` | 設定（PW変更・管理設定） | 全員（管理機能は ADMIN のみ） |
+| `/dashboard/settings` | 設定（PW変更・権限設定） | 全員（管理機能は ADMIN のみ） |
 | `/dashboard/admin/spec` | 仕様書（現行） | **ADMIN のみ** |
 | `/dashboard/admin/spec/extensibility` | 拡張性ロードマップ | **ADMIN のみ** |
 
@@ -185,10 +185,10 @@ public/                   # 静的ファイル（help 画像、auth/tiger.png）
 
 ## 機能仕様 — 管理・その他
 
-### 管理設定（`/dashboard/settings` 内・ADMIN のみ）
+### 権限設定（`/dashboard/settings` 内・ADMIN のみ）
 
-- ユーザー一覧 + ロール変更（ADMIN のみ API）
-- 削除済み MTG 一覧 + 復旧ボタン
+- ユーザー一覧 + ロール変更（ワード・権限で絞り込み可）
+- 削除済み MTG 一覧 + 復旧ボタン（ワード・日付・投稿者で絞り込み可）
 
 ### 使い方ガイド
 

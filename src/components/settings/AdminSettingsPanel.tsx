@@ -26,9 +26,9 @@ export function AdminSettingsPanel({
   return (
     <div className="space-y-8">
       <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:p-8">
-        <h2 className="text-lg font-semibold text-slate-900">管理設定</h2>
+        <h2 className="text-lg font-semibold text-slate-900">権限設定</h2>
         <p className="mt-2 text-sm text-slate-600">
-          登録ユーザーの一覧と権限を管理します。
+          登録ユーザーの一覧と権限を設定・管理します。
         </p>
 
         <div className="mt-5 rounded-2xl border border-sky-100 bg-sky-50 px-5 py-4 text-sm text-slate-700">
