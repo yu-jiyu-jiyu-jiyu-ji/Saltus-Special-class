@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 export default function AuthLayout({
   children,
 }: Readonly<{
@@ -20,11 +22,16 @@ export default function AuthLayout({
               特進クラスの MTG 記録とサポート対応を一元管理するためのベースプラットフォームです。
             </p>
           </div>
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur">
-            <p className="text-sm font-medium text-white">クリーンで使いやすい UI</p>
-            <p className="mt-2 text-xs leading-6 text-slate-300">
-              左ナビゲーションとメインコンテンツで、日々の業務をスムーズに進められます。
-            </p>
+
+          <div className="relative mx-auto w-full max-w-sm">
+            <Image
+              src="/auth/tiger.png"
+              alt="虎"
+              width={480}
+              height={480}
+              className="h-auto w-full object-contain drop-shadow-2xl"
+              priority
+            />
           </div>
         </aside>
 
