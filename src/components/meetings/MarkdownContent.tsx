@@ -6,6 +6,14 @@ type MarkdownContentProps = {
   className?: string;
 };
 
+/** Markdown の単一改行を表示上の改行として反映する */
+function preserveLineBreaks(content: string): string {
+  return content
+    .split(/\n{2,}/)
+    .map((block) => block.replace(/\n/g, "  \n"))
+    .join("\n\n");
+}
+
 export function MarkdownContent({ content, className = "" }: MarkdownContentProps) {
   return (
     <div className={`markdown-body ${className}`}>
@@ -69,7 +77,7 @@ export function MarkdownContent({ content, className = "" }: MarkdownContentProp
           hr: () => <hr className="my-6 border-slate-200" />,
         }}
       >
-        {content}
+        {preserveLineBreaks(content)}
       </ReactMarkdown>
     </div>
   );
