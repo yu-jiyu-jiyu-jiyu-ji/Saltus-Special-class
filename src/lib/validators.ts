@@ -28,11 +28,18 @@ const homeworkItemSchema = z.object({
   completed: z.boolean(),
 });
 
+const meetingTitleSchema = z
+  .string()
+  .max(200, "タイトルは200文字以内で入力してください。")
+  .optional()
+  .or(z.literal(""));
+
 export const meetingCreateSchema = z.object({
   date: z
     .string()
     .min(1, "MTG実施日を選択してください。")
     .regex(/^\d{4}-\d{2}-\d{2}$/, "日付の形式が正しくありません。"),
+  title: meetingTitleSchema,
   content: z
     .string()
     .min(1, "会話内容を入力してください。")
@@ -57,6 +64,7 @@ export const meetingUpdateSchema = z
       .string()
       .regex(/^\d{4}-\d{2}-\d{2}$/, "日付の形式が正しくありません。")
       .optional(),
+    title: meetingTitleSchema,
     content: z
       .string()
       .min(1, "会話内容を入力してください。")
@@ -64,9 +72,16 @@ export const meetingUpdateSchema = z
       .optional(),
     homework: z.array(homeworkItemSchema).max(50).optional(),
   })
-  .refine((data) => data.date || data.content || data.homework !== undefined, {
-    message: "更新する項目がありません。",
-  });
+  .refine(
+    (data) =>
+      data.date ||
+      data.title !== undefined ||
+      data.content ||
+      data.homework !== undefined,
+    {
+      message: "更新する項目がありません。",
+    },
+  );
 
 export const changePasswordSchema = z.object({
   currentPassword: z.string().min(1, "現在のパスワードを入力してください。"),
@@ -85,16 +100,22 @@ export const userRoleUpdateSchema = z.object({
 });
 
 const ticketField = z.string().min(1).max(5000);
+const ticketTitleField = z
+  .string()
+  .min(1, "タイトルを入力してください。")
+  .max(200, "タイトルは200文字以内で入力してください。");
 
 export const ticketCreateSchema = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("SYSTEM"),
+    title: ticketTitleField,
     systemField1: ticketField,
     systemField2: ticketField,
     systemField3: z.string().max(5000).optional().or(z.literal("")),
   }),
   z.object({
     type: z.literal("USAGE"),
+    title: ticketTitleField,
     usageField1: ticketField,
     usageField2: ticketField,
   }),

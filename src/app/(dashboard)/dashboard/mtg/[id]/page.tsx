@@ -6,10 +6,11 @@ import { MeetingDetailView } from "@/components/meetings/MeetingDetailView";
 import { PageHeader } from "@/components/layout/PageHeader";
 import {
   canAccessMeeting,
+  canDeleteMeeting,
   canEditMeeting,
   canViewAllMeetings,
   formatMeetingDate,
-  getMeetingCardTitle,
+  getMeetingDisplayTitle,
 } from "@/lib/meetings";
 import { prisma } from "@/lib/prisma";
 import { getSessionUser } from "@/lib/session";
@@ -22,13 +23,15 @@ export async function generateMetadata({
   params,
 }: MtgDetailPageProps): Promise<Metadata> {
   const { id } = await params;
-  const meeting = await prisma.meeting.findUnique({
-    where: { id },
-    select: { content: true },
+  const meeting = await prisma.meeting.findFirst({
+    where: { id, deletedAt: null },
+    select: { title: true },
   });
 
   return {
-    title: meeting ? `${getMeetingCardTitle(meeting.content)} | MTG議事録` : "MTG議事録",
+    title: meeting
+      ? `${getMeetingDisplayTitle(meeting.title)} | MTG議事録`
+      : "MTG議事録",
   };
 }
 
@@ -36,8 +39,8 @@ export default async function MtgDetailPage({ params }: MtgDetailPageProps) {
   const user = await getSessionUser();
   const { id } = await params;
 
-  const meeting = await prisma.meeting.findUnique({
-    where: { id },
+  const meeting = await prisma.meeting.findFirst({
+    where: { id, deletedAt: null },
     include: {
       user: {
         select: { id: true, name: true, email: true },
@@ -63,10 +66,12 @@ export default async function MtgDetailPage({ params }: MtgDetailPageProps) {
 
   const showAuthor = canViewAllMeetings(user!.role);
   const canEdit = canEditMeeting(user!, meeting);
+  const canDelete = canDeleteMeeting(user!, meeting);
 
   const serialized = {
     id: meeting.id,
     date: meeting.date.toISOString(),
+    title: meeting.title,
     content: meeting.content,
     homework: meeting.homework,
     userId: meeting.userId,
@@ -89,7 +94,7 @@ export default async function MtgDetailPage({ params }: MtgDetailPageProps) {
       </div>
 
       <PageHeader
-        title={getMeetingCardTitle(meeting.content)}
+        title={getMeetingDisplayTitle(meeting.title)}
         description={formatMeetingDate(meeting.date)}
       />
 
@@ -99,6 +104,7 @@ export default async function MtgDetailPage({ params }: MtgDetailPageProps) {
         currentUser={user!}
         showAuthor={showAuthor}
         canEdit={canEdit}
+        canDelete={canDelete}
       />
     </div>
   );

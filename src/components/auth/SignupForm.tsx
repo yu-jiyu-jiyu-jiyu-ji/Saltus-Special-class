@@ -52,7 +52,7 @@ export function SignupForm() {
   return (
     <AuthCard
       title="新規ユーザー追加"
-      subtitle="自コミュニティ内メンバー向けのアカウント作成"
+      subtitle="自クラス内メンバー向けのアカウント作成"
       footer={
         <p className="text-center text-sm text-slate-500">
           既にアカウントをお持ちの方は{" "}

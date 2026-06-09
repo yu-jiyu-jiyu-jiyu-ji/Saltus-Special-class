@@ -19,6 +19,7 @@ export async function generateMetadata({
   const ticket = await prisma.ticket.findUnique({
     where: { id },
     select: {
+      title: true,
       type: true,
       systemField1: true,
       usageField1: true,

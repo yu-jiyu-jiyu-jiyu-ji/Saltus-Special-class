@@ -3,12 +3,13 @@ import Link from "next/link";
 import {
   excerptContent,
   formatMeetingDateShort,
-  getMeetingCardTitle,
+  getMeetingDisplayTitle,
 } from "@/lib/meetings";
 
 export type MeetingCardData = {
   id: string;
   date: Date;
+  title?: string | null;
   content: string;
   user: {
     id: string;
@@ -36,8 +37,8 @@ export function MeetingCard({ meeting, showAuthor = false }: MeetingCardProps) {
         ) : null}
       </div>
 
-      <h3 className="mt-3 line-clamp-2 text-base font-medium leading-7 text-slate-900 group-hover:text-sky-800">
-        {getMeetingCardTitle(meeting.content)}
+      <h3 className="mt-3 line-clamp-2 text-base font-bold leading-7 text-slate-900 group-hover:text-sky-800">
+        {getMeetingDisplayTitle(meeting.title)}
       </h3>
 
       <p className="mt-2 line-clamp-2 text-sm leading-6 text-slate-500">

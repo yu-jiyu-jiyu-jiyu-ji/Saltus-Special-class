@@ -46,6 +46,7 @@ model User {
 model Ticket {
   id           String       @id @default(cuid())
   createdAt    DateTime     @default(now())
+  title        String       @default("")
   type         TicketType
   status       TicketStatus @default(OPEN)
   systemField1 String?
@@ -78,7 +79,9 @@ model Comment {
 model Meeting {
   id           String           @id @default(cuid())
   createdAt    DateTime         @default(now())
+  deletedAt    DateTime?
   date         DateTime         @db.Date
+  title        String?
   participants String?
   content      String           @db.Text
   homework     Json             @default("[]")
@@ -88,6 +91,7 @@ model Meeting {
 
   @@index([userId])
   @@index([date])
+  @@index([deletedAt])
 }
 
 model MeetingComment {

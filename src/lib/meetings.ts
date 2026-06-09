@@ -20,6 +20,17 @@ export function canEditMeeting(
   return canViewAllMeetings(user.role) || meeting.userId === user.id;
 }
 
+export function canDeleteMeeting(
+  user: SessionUser,
+  meeting: { userId: string },
+): boolean {
+  return canEditMeeting(user, meeting);
+}
+
+export function canRestoreMeeting(user: SessionUser): boolean {
+  return user.role === "ADMIN";
+}
+
 export type MeetingListFilters = {
   q?: string;
   date?: string;
@@ -30,7 +41,9 @@ export function buildMeetingListWhere(
   user: SessionUser,
   filters: MeetingListFilters = {},
 ): Prisma.MeetingWhereInput {
-  const where: Prisma.MeetingWhereInput = {};
+  const where: Prisma.MeetingWhereInput = {
+    deletedAt: null,
+  };
 
   if (!canViewAllMeetings(user.role)) {
     where.userId = user.id;
@@ -53,6 +66,7 @@ export function buildMeetingListWhere(
   const keyword = filters.q?.trim();
   if (keyword) {
     where.OR = [
+      { title: { contains: keyword, mode: "insensitive" } },
       { content: { contains: keyword, mode: "insensitive" } },
       { user: { name: { contains: keyword, mode: "insensitive" } } },
     ];
@@ -69,9 +83,14 @@ export function excerptContent(content: string, maxLength = 120): string {
   return `${normalized.slice(0, maxLength)}…`;
 }
 
-export function getMeetingCardTitle(content: string): string {
-  const excerpt = excerptContent(content, 60);
-  return excerpt || "MTG議事録";
+export function getMeetingDisplayTitle(title?: string | null): string {
+  const normalized = title?.trim();
+  return normalized || "ー";
+}
+
+export function normalizeMeetingTitle(title?: string | null): string | null {
+  const normalized = title?.trim();
+  return normalized || null;
 }
 
 export function formatMeetingDate(date: Date): string {

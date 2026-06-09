@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 
 import { isApiError, requireApiUser } from "@/lib/api-auth";
-import { canAccessMeeting, canEditMeeting } from "@/lib/meetings";
+import {
+  canAccessMeeting,
+  canDeleteMeeting,
+  canEditMeeting,
+  normalizeMeetingTitle,
+} from "@/lib/meetings";
 import { prisma } from "@/lib/prisma";
 import { meetingHomeworkSchema, meetingUpdateSchema } from "@/lib/validators";
 
@@ -9,16 +14,9 @@ type RouteContext = {
   params: Promise<{ id: string }>;
 };
 
-export async function GET(_request: Request, context: RouteContext) {
-  const userOrError = await requireApiUser();
-  if (isApiError(userOrError)) {
-    return userOrError;
-  }
-
-  const { id } = await context.params;
-
-  const meeting = await prisma.meeting.findUnique({
-    where: { id },
+async function getActiveMeeting(id: string) {
+  return prisma.meeting.findFirst({
+    where: { id, deletedAt: null },
     include: {
       user: {
         select: { id: true, name: true, email: true },
@@ -33,6 +31,16 @@ export async function GET(_request: Request, context: RouteContext) {
       },
     },
   });
+}
+
+export async function GET(_request: Request, context: RouteContext) {
+  const userOrError = await requireApiUser();
+  if (isApiError(userOrError)) {
+    return userOrError;
+  }
+
+  const { id } = await context.params;
+  const meeting = await getActiveMeeting(id);
 
   if (!meeting) {
     return NextResponse.json({ error: "MTGが見つかりません。" }, { status: 404 });
@@ -56,8 +64,8 @@ export async function PATCH(request: Request, context: RouteContext) {
 
   const { id } = await context.params;
 
-  const meeting = await prisma.meeting.findUnique({
-    where: { id },
+  const meeting = await prisma.meeting.findFirst({
+    where: { id, deletedAt: null },
     select: { id: true, userId: true },
   });
 
@@ -78,7 +86,8 @@ export async function PATCH(request: Request, context: RouteContext) {
     const homeworkOnly =
       body.homework !== undefined &&
       body.date === undefined &&
-      body.content === undefined;
+      body.content === undefined &&
+      body.title === undefined;
 
     const parsed = homeworkOnly
       ? meetingHomeworkSchema.safeParse(body)
@@ -94,12 +103,16 @@ export async function PATCH(request: Request, context: RouteContext) {
     const data = parsed.data;
     const updateData: {
       date?: Date;
+      title?: string | null;
       content?: string;
       homework?: typeof data.homework;
     } = {};
 
     if ("date" in data && data.date) {
       updateData.date = new Date(`${data.date}T00:00:00.000Z`);
+    }
+    if ("title" in data && data.title !== undefined) {
+      updateData.title = normalizeMeetingTitle(data.title);
     }
     if ("content" in data && data.content) {
       updateData.content = data.content;
@@ -118,6 +131,46 @@ export async function PATCH(request: Request, context: RouteContext) {
     console.error("[meetings/PATCH]", error);
     return NextResponse.json(
       { error: "議事録の更新中にエラーが発生しました。" },
+      { status: 500 },
+    );
+  }
+}
+
+export async function DELETE(_request: Request, context: RouteContext) {
+  const userOrError = await requireApiUser();
+  if (isApiError(userOrError)) {
+    return userOrError;
+  }
+
+  const { id } = await context.params;
+
+  const meeting = await prisma.meeting.findFirst({
+    where: { id, deletedAt: null },
+    select: { id: true, userId: true },
+  });
+
+  if (!meeting) {
+    return NextResponse.json({ error: "MTGが見つかりません。" }, { status: 404 });
+  }
+
+  if (!canDeleteMeeting(userOrError, meeting)) {
+    return NextResponse.json(
+      { error: "このMTGを削除する権限がありません。" },
+      { status: 403 },
+    );
+  }
+
+  try {
+    const deleted = await prisma.meeting.update({
+      where: { id },
+      data: { deletedAt: new Date() },
+    });
+
+    return NextResponse.json({ meeting: deleted });
+  } catch (error) {
+    console.error("[meetings/DELETE]", error);
+    return NextResponse.json(
+      { error: "議事録の削除中にエラーが発生しました。" },
       { status: 500 },
     );
   }

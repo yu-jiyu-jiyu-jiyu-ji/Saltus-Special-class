@@ -24,6 +24,7 @@ type MeetingDetailViewProps = {
   meeting: {
     id: string;
     date: string;
+    title?: string | null;
     content: string;
     homework: unknown;
     userId: string;
@@ -37,6 +38,7 @@ type MeetingDetailViewProps = {
   currentUser: SessionUser;
   showAuthor: boolean;
   canEdit: boolean;
+  canDelete: boolean;
 };
 
 const inputClassName =
@@ -59,22 +61,26 @@ export function MeetingDetailView({
   currentUser,
   showAuthor,
   canEdit,
+  canDelete,
 }: MeetingDetailViewProps) {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [date, setDate] = useState(toDateInputValue(meeting.date));
+  const [title, setTitle] = useState(meeting.title ?? "");
   const [content, setContent] = useState(meeting.content);
   const [homework, setHomework] = useState<HomeworkItem[]>(
     parseHomeworkItems(meeting.homework),
   );
   const [homeworkLoading, setHomeworkLoading] = useState<string | null>(null);
   const [saveLoading, setSaveLoading] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const [comment, setComment] = useState("");
   const [commentLoading, setCommentLoading] = useState(false);
   const [error, setError] = useState("");
 
   function startEditing() {
     setDate(toDateInputValue(meeting.date));
+    setTitle(meeting.title ?? "");
     setContent(meeting.content);
     setHomework(parseHomeworkItems(meeting.homework));
     setError("");
@@ -132,6 +138,7 @@ export function MeetingDetailView({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           date,
+          title,
           content,
           homework: homeworkPayload,
         }),
@@ -197,6 +204,38 @@ export function MeetingDetailView({
     setHomework((items) => items.filter((item) => item.id !== id));
   }
 
+  async function handleDelete() {
+    if (
+      !window.confirm(
+        "このMTG議事録を削除しますか？削除後は一覧に表示されなくなります。",
+      )
+    ) {
+      return;
+    }
+
+    setError("");
+    setDeleteLoading(true);
+
+    try {
+      const response = await fetch(`/api/meetings/${meeting.id}`, {
+        method: "DELETE",
+      });
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error ?? "削除に失敗しました。");
+        return;
+      }
+
+      router.push("/dashboard/mtg");
+      router.refresh();
+    } catch {
+      setError("通信エラーが発生しました。");
+    } finally {
+      setDeleteLoading(false);
+    }
+  }
+
   function toggleHomeworkInEdit(itemId: string) {
     setHomework((items) =>
       items.map((item) =>
@@ -244,22 +283,51 @@ export function MeetingDetailView({
             )}
           </div>
 
-          {canEdit ? (
-            <button
-              type="button"
-              disabled={saveLoading}
-              onClick={isEditing ? handleCompleteEdit : startEditing}
-              className={[
-                "shrink-0 rounded-xl px-4 py-2 text-sm font-semibold transition disabled:opacity-60",
-                isEditing
-                  ? "bg-sky-600 text-white hover:bg-sky-700"
-                  : "border border-slate-200 text-slate-700 hover:bg-slate-50",
-              ].join(" ")}
-            >
-              {saveLoading ? "保存中..." : isEditing ? "完了" : "編集"}
-            </button>
-          ) : null}
+          <div className="flex shrink-0 flex-wrap items-center gap-2">
+            {canEdit ? (
+              <button
+                type="button"
+                disabled={saveLoading || deleteLoading}
+                onClick={isEditing ? handleCompleteEdit : startEditing}
+                className={[
+                  "rounded-xl px-4 py-2 text-sm font-semibold transition disabled:opacity-60",
+                  isEditing
+                    ? "bg-sky-600 text-white hover:bg-sky-700"
+                    : "border border-slate-200 text-slate-700 hover:bg-slate-50",
+                ].join(" ")}
+              >
+                {saveLoading ? "保存中..." : isEditing ? "完了" : "編集"}
+              </button>
+            ) : null}
+            {canDelete && !isEditing ? (
+              <button
+                type="button"
+                disabled={deleteLoading}
+                onClick={handleDelete}
+                className="rounded-xl border border-red-200 px-4 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:opacity-60"
+              >
+                {deleteLoading ? "削除中..." : "削除"}
+              </button>
+            ) : null}
+          </div>
         </div>
+
+        {isEditing ? (
+          <div className="border-b border-slate-100 pb-5 pt-2">
+            <label htmlFor="edit-title" className="block text-xs font-medium text-slate-500">
+              タイトル（任意）
+            </label>
+            <input
+              id="edit-title"
+              type="text"
+              maxLength={200}
+              placeholder="一覧に表示するタイトル（未入力の場合は「ー」）"
+              className={`${inputClassName} mt-2`}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+            />
+          </div>
+        ) : null}
 
         <div className="pt-6">
           <h2 className="mb-4 text-sm font-semibold text-slate-900">会話内容・議事録</h2>

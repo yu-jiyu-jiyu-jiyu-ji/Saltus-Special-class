@@ -47,11 +47,17 @@ export function buildTicketListWhere(user: SessionUser): Prisma.TicketWhereInput
 }
 
 export function getTicketTitle(ticket: {
+  title?: string | null;
   type: TicketType;
   systemField1?: string | null;
   usageField1?: string | null;
   usageField2?: string | null;
 }): string {
+  const explicitTitle = ticket.title?.trim();
+  if (explicitTitle) {
+    return explicitTitle;
+  }
+
   if (ticket.type === "SYSTEM") {
     return ticket.systemField1?.trim() || "システムへの問い合わせ";
   }

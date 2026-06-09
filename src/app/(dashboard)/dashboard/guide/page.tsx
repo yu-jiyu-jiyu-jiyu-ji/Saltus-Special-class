@@ -3,14 +3,21 @@ import type { Metadata } from "next";
 import { GuideMarkdown } from "@/components/guide/GuideMarkdown";
 import { GuideToc } from "@/components/guide/GuideToc";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { extractGuideSections, loadMemberGuideMarkdown } from "@/lib/help-docs";
+import {
+  extractGuideSections,
+  filterGuideContentForRole,
+  loadMemberGuideMarkdown,
+} from "@/lib/help-docs";
+import { getSessionUser } from "@/lib/session";
 
 export const metadata: Metadata = {
-  title: "使い方ガイド | Saltus 特進",
+  title: "使い方ガイド | Saltus 特進クラス",
 };
 
 export default async function GuidePage() {
-  const content = await loadMemberGuideMarkdown();
+  const user = await getSessionUser();
+  const rawContent = await loadMemberGuideMarkdown();
+  const content = filterGuideContentForRole(rawContent, user!.role);
   const sections = extractGuideSections(content);
 
   return (

@@ -17,7 +17,7 @@ export default function AuthLayout({
               ＆サポート管理
             </h1>
             <p className="mt-4 max-w-md text-sm leading-7 text-slate-300">
-              特進コミュニティの MTG 記録とサポート対応を一元管理するためのベースプラットフォームです。
+              特進クラスの MTG 記録とサポート対応を一元管理するためのベースプラットフォームです。
             </p>
           </div>
           <div className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur">

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { isApiError, requireApiUser } from "@/lib/api-auth";
-import { buildMeetingListWhere } from "@/lib/meetings";
+import { buildMeetingListWhere, normalizeMeetingTitle } from "@/lib/meetings";
 import { prisma } from "@/lib/prisma";
 import { meetingCreateSchema } from "@/lib/validators";
 
@@ -48,10 +48,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const { date, content, homework } = parsed.data;
+    const { date, title, content, homework } = parsed.data;
     const meeting = await prisma.meeting.create({
       data: {
         date: new Date(`${date}T00:00:00.000Z`),
+        title: normalizeMeetingTitle(title),
         content,
         homework: homework ?? [],
         userId: userOrError.id,

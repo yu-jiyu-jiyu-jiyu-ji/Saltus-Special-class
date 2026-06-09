@@ -22,6 +22,7 @@ function newHomeworkItem(text = ""): HomeworkItem {
 export function MeetingForm() {
   const router = useRouter();
   const [date, setDate] = useState("");
+  const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [homework, setHomework] = useState<HomeworkItem[]>([newHomeworkItem()]);
   const [error, setError] = useState("");
@@ -56,6 +57,7 @@ export function MeetingForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           date,
+          title,
           content,
           homework: homeworkPayload,
         }),
@@ -83,6 +85,21 @@ export function MeetingForm() {
           {error}
         </div>
       ) : null}
+
+      <div className="space-y-2">
+        <label htmlFor="title" className="block text-sm font-medium text-slate-700">
+          タイトル（任意）
+        </label>
+        <input
+          id="title"
+          type="text"
+          maxLength={200}
+          placeholder="一覧に表示するタイトル（未入力の場合は「ー」）"
+          className={inputClassName}
+          value={title}
+          onChange={(event) => setTitle(event.target.value)}
+        />
+      </div>
 
       <div className="space-y-2">
         <label htmlFor="date" className="block text-sm font-medium text-slate-700">

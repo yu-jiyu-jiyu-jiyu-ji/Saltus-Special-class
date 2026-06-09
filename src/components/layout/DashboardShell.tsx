@@ -77,7 +77,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
                   <p className="truncate text-sm font-semibold text-slate-900">
                     個別MTG知見ストック＆サポート管理
                   </p>
-                  <p className="truncate text-xs text-slate-500">Saltus 特進コミュニティ</p>
+                  <p className="truncate text-xs text-slate-500">Saltus 特進クラス</p>
                 </div>
               </div>
 

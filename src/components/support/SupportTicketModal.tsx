@@ -16,6 +16,7 @@ type SupportTicketModalProps = {
 export function SupportTicketModal({ open, onClose }: SupportTicketModalProps) {
   const router = useRouter();
   const [type, setType] = useState<TicketTypeOption>("SYSTEM");
+  const [title, setTitle] = useState("");
   const [systemField1, setSystemField1] = useState("");
   const [systemField2, setSystemField2] = useState("");
   const [systemField3, setSystemField3] = useState("");
@@ -50,6 +51,7 @@ export function SupportTicketModal({ open, onClose }: SupportTicketModalProps) {
 
   function resetForm() {
     setType("SYSTEM");
+    setTitle("");
     setSystemField1("");
     setSystemField2("");
     setSystemField3("");
@@ -67,12 +69,14 @@ export function SupportTicketModal({ open, onClose }: SupportTicketModalProps) {
       type === "SYSTEM"
         ? {
             type,
+            title,
             systemField1,
             systemField2,
             systemField3: systemField3 || undefined,
           }
         : {
             type,
+            title,
             usageField1,
             usageField2,
           };
@@ -162,6 +166,19 @@ export function SupportTicketModal({ open, onClose }: SupportTicketModalProps) {
               {error}
             </div>
           ) : null}
+
+          <Field label="タイトル" id="ticketTitle" required>
+            <input
+              id="ticketTitle"
+              type="text"
+              required
+              maxLength={200}
+              className={inputClassName}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="問い合わせの概要"
+            />
+          </Field>
 
           {type === "SYSTEM" ? (
             <>

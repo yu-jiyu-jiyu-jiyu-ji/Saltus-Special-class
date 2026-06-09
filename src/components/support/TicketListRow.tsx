@@ -12,6 +12,7 @@ import type { TicketStatus, TicketType } from "@/generated/prisma/client";
 export type TicketListItem = {
   id: string;
   createdAt: Date;
+  title?: string | null;
   type: TicketType;
   status: TicketStatus;
   systemField1?: string | null;

@@ -52,6 +52,7 @@ export async function POST(request: Request) {
           ? {
               type: "SYSTEM",
               status: "OPEN",
+              title: data.title.trim(),
               systemField1: data.systemField1,
               systemField2: data.systemField2,
               systemField3: data.systemField3?.trim() || null,
@@ -60,6 +61,7 @@ export async function POST(request: Request) {
           : {
               type: "USAGE",
               status: "OPEN",
+              title: data.title.trim(),
               usageField1: data.usageField1,
               usageField2: data.usageField2,
               userId: userOrError.id,

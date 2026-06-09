@@ -24,7 +24,7 @@ export function GuideMarkdown({ content }: GuideMarkdownProps) {
                 id={id}
                 className="mb-3 mt-10 scroll-mt-28 border-b border-slate-100 pb-2 text-xl font-bold text-slate-900 first:mt-0"
               >
-                {children}
+                {h2Index}. {children}
               </h2>
             );
           },

@@ -27,6 +27,7 @@ type ThreadComment = {
 type ThreadTicket = {
   id: string;
   createdAt: string;
+  title?: string | null;
   type: TicketType;
   status: TicketStatus;
   systemField1?: string | null;

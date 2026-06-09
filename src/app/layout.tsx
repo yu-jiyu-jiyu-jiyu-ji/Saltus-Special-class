@@ -11,7 +11,7 @@ const notoSansJp = Noto_Sans_JP({
 export const metadata: Metadata = {
   title: "Saltus 特進 | MTG知見ストック＆サポート",
   description:
-    "個別MTG知見ストック＆サポート管理システム — Saltus特進コミュニティ向け",
+    "個別MTG知見ストック＆サポート管理システム — Saltus特進クラス向け",
 };
 
 export default function RootLayout({
